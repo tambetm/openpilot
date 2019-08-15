@@ -5,7 +5,7 @@ from selfdrive.swaglog import cloudlog
 from selfdrive.config import Conversions as CV
 from selfdrive.controls.lib.drive_helpers import EventTypes as ET, create_event
 from selfdrive.controls.lib.vehicle_model import VehicleModel
-from selfdrive.car.ford.carstate import CarState, get_can_parser
+from selfdrive.car.ford.carstate import CarState, get_can_parser, get_can_parser_lkas
 from selfdrive.car.ford.values import MAX_ANGLE
 from selfdrive.car import STD_CARGO_KG, scale_rot_inertia, scale_tire_stiffness
 
@@ -24,6 +24,7 @@ class CarInterface(object):
     self.CS = CarState(CP)
 
     self.cp = get_can_parser(CP)
+    self.cp_lkas = get_can_parser_lkas(CP)
 
     self.CC = None
     if CarController is not None:
@@ -54,7 +55,7 @@ class CarInterface(object):
 
     ret.wheelbase = 2.85
     ret.steerRatio = 14.8
-    ret.mass = 3045. * CV.LB_TO_KG + STD_CARGO_KG
+    ret.mass = 1595. + STD_CARGO_KG
     ret.lateralTuning.pid.kiBP, ret.lateralTuning.pid.kpBP = [[0.], [0.]]
     ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.01], [0.005]]     # TODO: tune this
     ret.lateralTuning.pid.kf = 1. / MAX_ANGLE   # MAX Steer angle to normalize FF
@@ -109,13 +110,14 @@ class CarInterface(object):
   def update(self, c, can_strings):
     # ******************* do can recv *******************
     self.cp.update_strings(int(sec_since_boot() * 1e9), can_strings)
+    self.cp_lkas.update_strings(int(sec_since_boot() * 1e9), can_strings)
 
-    self.CS.update(self.cp)
+    self.CS.update(self.cp, self.cp_lkas)
 
     # create message
     ret = car.CarState.new_message()
 
-    ret.canValid = self.cp.can_valid
+    ret.canValid = self.cp.can_valid and self.cp_lkas.can_valid
 
     # speeds
     ret.vEgo = self.CS.v_ego
@@ -140,7 +142,30 @@ class CarInterface(object):
     ret.cruiseState.speed = self.CS.v_cruise_pcm
     ret.cruiseState.available = self.CS.pcm_acc_status != 0
 
-    ret.genericToggle = self.CS.generic_toggle
+    # blinkers
+    ret.leftBlinker = self.CS.left_blinker_on
+    ret.rightBlinker = self.CS.right_blinker_on
+
+    # doors
+    ret.doorOpen = self.CS.door_open
+
+    # button events
+    buttonEvents = []
+
+    # blinkers
+    if self.CS.left_blinker_on != self.CS.prev_left_blinker_on:
+      be = car.CarState.ButtonEvent.new_message()
+      be.type = 'leftBlinker'
+      be.pressed = self.CS.left_blinker_on
+      buttonEvents.append(be)
+
+    if self.CS.right_blinker_on != self.CS.prev_right_blinker_on:
+      be = car.CarState.ButtonEvent.new_message()
+      be.type = 'rightBlinker'
+      be.pressed = self.CS.right_blinker_on
+      buttonEvents.append(be)
+
+    ret.buttonEvents = buttonEvents
 
     # events
     events = []
@@ -158,6 +183,9 @@ class CarInterface(object):
     if (ret.gasPressed and not self.gas_pressed_prev) or \
        (ret.brakePressed and (not self.brake_pressed_prev or ret.vEgo > 0.001)):
       events.append(create_event('pedalPressed', [ET.NO_ENTRY, ET.USER_DISABLE]))
+
+    if ret.doorOpen:
+      events.append(create_event('doorOpen', [ET.NO_ENTRY, ET.SOFT_DISABLE]))
 
     if ret.gasPressed:
       events.append(create_event('pedalPressed', [ET.PRE_ENABLE]))
