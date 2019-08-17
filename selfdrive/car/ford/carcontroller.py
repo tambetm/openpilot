@@ -1,4 +1,5 @@
 from cereal import car
+from selfdrive.config import Conversions as CV
 from selfdrive.car.ford.fordcan import make_can_msg, create_steer_command, create_lkas_ui, \
                                        spam_cancel_button
 from selfdrive.can.packer import CANPacker
@@ -33,7 +34,7 @@ class CarController():
 
       if (frame % 3) == 0:
 
-        curvature = self.vehicle_model.calc_curvature(actuators.steerAngle*3.1415/180., CS.v_ego)
+        curvature = self.vehicle_model.calc_curvature(actuators.steerAngle*CV.DEG_TO_RAD, CS.v_ego)
 
         # The use of the toggle below is handy for trying out the various LKAS modes
         if TOGGLE_DEBUG:

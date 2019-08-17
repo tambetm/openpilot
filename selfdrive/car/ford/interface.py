@@ -117,7 +117,9 @@ class CarInterface(CarInterfaceBase):
 
     # speeds
     ret.vEgo = self.CS.v_ego
+    ret.aEgo = self.CS.a_ego
     ret.vEgoRaw = self.CS.v_ego_raw
+    ret.yawRate = self.VM.yaw_rate(self.CS.angle_steers * CV.DEG_TO_RAD, self.CS.v_ego)
     ret.standstill = self.CS.standstill
     ret.wheelSpeeds.fl = self.CS.v_wheel_fl
     ret.wheelSpeeds.fr = self.CS.v_wheel_fr
@@ -126,6 +128,8 @@ class CarInterface(CarInterfaceBase):
 
     # steering wheel
     ret.steeringAngle = self.CS.angle_steers
+    # apparently not used?
+    #ret.steeringRate = self.CS.angle_steers_rate
     ret.steeringPressed = self.CS.steer_override
 
     # gas pedal
@@ -137,6 +141,7 @@ class CarInterface(CarInterfaceBase):
     ret.cruiseState.enabled = not (self.CS.pcm_acc_status in [0, 3])
     ret.cruiseState.speed = self.CS.v_cruise_pcm
     ret.cruiseState.available = self.CS.pcm_acc_status != 0
+    ret.cruiseState.speedOffset = 0.
 
     # blinkers
     ret.leftBlinker = self.CS.left_blinker_on
@@ -144,6 +149,7 @@ class CarInterface(CarInterfaceBase):
 
     # doors
     ret.doorOpen = self.CS.door_open
+    #ret.seatbeltUnlatched = not self.CS.seatbelt
 
     # button events
     buttonEvents = []
