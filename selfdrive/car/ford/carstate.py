@@ -20,6 +20,7 @@ def get_can_parser(CP):
     ("ApedPosScal_Pc_Actl", "EngineData_14", 0.),
     ("Dist_Incr", "Steering_Buttons", 0.),
     ("Brake_Drv_Appl", "Cruise_Status", 0.),
+    ("Brake_Lights", "BCM_to_HS_Body", 0.),
     ("Steering_Buttons", "Left_Turn_Light", 0.),
     ("Steering_Buttons", "Right_Turn_Light", 0.),
     ("Doors", "Door_FL_Open", 0.),
