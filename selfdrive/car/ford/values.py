@@ -24,5 +24,5 @@ ECU_FINGERPRINT = {
 
 DBC = {
   CAR.FUSION: dbc_dict('ford_fusion_2018_pt', 'ford_fusion_2018_adas'),
-  CAR.MONDEO: dbc_dict('ford_fusion_2018_pt', 'ford_fusion_2018_adas'),
+  CAR.MONDEO: dbc_dict('ford_mondeo_2016_pt', 'ford_fusion_2018_adas'),
 }
