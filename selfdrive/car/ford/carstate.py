@@ -18,7 +18,7 @@ def get_can_parser(CP):
     ("Cruise_State", "Cruise_Status", 0.),
     ("Set_Speed", "Cruise_Status", 0.),
     ("ApedPosScal_Pc_Actl", "EngineData_14", 0.),
-    ("Dist_Incr", "Steering_Buttons", 0.),
+    ("Lane_Keep_Toggle", "Steering_Buttons", 0.),
     ("Brake_Drv_Appl", "Cruise_Status", 0.),
     ("Brake_Lights", "BCM_to_HS_Body", 0.),
     ("Steering_Buttons", "Left_Turn_Light", 0.),
@@ -102,7 +102,7 @@ class CarState(object):
     self.user_gas = cp.vl["EngineData_14"]['ApedPosScal_Pc_Actl']
     self.brake_pressed = bool(cp.vl["Cruise_Status"]["Brake_Drv_Appl"])
     self.brake_lights = bool(cp.vl["BCM_to_HS_Body"]["Brake_Lights"])
-    self.generic_toggle = bool(cp.vl["Steering_Buttons"]["Dist_Incr"])
+    self.generic_toggle = bool(cp.vl["Steering_Buttons"]["Lane_Keep_Toggle"])
 
     self.left_blinker_on = bool(cp.vl["Steering_Buttons"]["Left_Turn_Light"])
     self.right_blinker_on = bool(cp.vl["Steering_Buttons"]["Right_Turn_Light"])

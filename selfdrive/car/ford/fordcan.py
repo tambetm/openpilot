@@ -9,8 +9,8 @@ def make_can_msg(addr, dat, alt, cks=False):
 def create_steer_command(packer, angle_cmd, enabled, lkas_state, angle_steers, curvature, lkas_action):
   """Creates a CAN message for the Ford Steer Command."""
 
-  #if enabled and lkas available:
-  if enabled and lkas_state in [2,3]: #and (frame % 500) >= 3:
+  #if enabled and lkaslkas available:
+  if enabled: #and lkas_state in [2,3]: #and (frame % 500) >= 3:
     action = lkas_action
   else:
     action = 0xf
