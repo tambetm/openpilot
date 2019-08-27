@@ -150,6 +150,7 @@ class CarInterface(object):
     # blinkers
     ret.leftBlinker = self.CS.left_blinker_on
     ret.rightBlinker = self.CS.right_blinker_on
+    ret.genericToggle = self.CS.generic_toggle
 
     # doors
     ret.doorOpen = self.CS.door_open
