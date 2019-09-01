@@ -26,13 +26,18 @@ if __name__ == "__main__":
   a = 0
   while True:
     # flood
+    print "Sending:", a
     msg = b"\xaa"*4 + struct.pack("I", a)
     p.can_send(0xaa, msg, 0)
     p.can_send(0xaa, msg, 1)
     p.can_send(0xaa, msg, 4)
     time.sleep(0.01)
 
+    print "Receiving:"
     dat = p.can_recv()
     if len(dat) > 0:
-      print(dat)
+      for m in dat:
+        if m[0] == 0xaa:
+          print(m)
     a += 1
+    #time.sleep(1)
