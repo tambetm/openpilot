@@ -26,7 +26,7 @@ static void ford_rx_hook(CAN_FIFOMailBox_TypeDef *to_push) {
   // state machine to enter and exit controls
   if (addr == 0x83) {
     bool cancel = GET_BYTE(to_push, 1) & 0x1;
-    bool set_or_resume = GET_BYTE(to_push, 3) & 0x15;
+    bool set_or_resume = GET_BYTE(to_push, 3) & 0x1a;
     if (cancel) {
       controls_allowed = 0;
     }
