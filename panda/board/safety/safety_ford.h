@@ -26,7 +26,7 @@ static void ford_rx_hook(CAN_FIFOMailBox_TypeDef *to_push) {
   // state machine to enter and exit controls
   if (addr == 0x83) {
     bool cancel = GET_BYTE(to_push, 1) & 0x1;
-    bool set_or_resume = GET_BYTE(to_push, 3) & 0x1a;
+    bool set_or_resume = GET_BYTE(to_push, 3) & 0x1A;
     if (cancel) {
       controls_allowed = 0;
     }
@@ -83,7 +83,7 @@ static int ford_tx_hook(CAN_FIFOMailBox_TypeDef *to_send) {
   // FORCE CANCEL: safety check only relevant when spamming the cancel button
   // ensuring that set and resume aren't sent
   if (addr == 0x83) {
-    if ((GET_BYTE(to_send, 3) & 0x30) != 0) {
+    if ((GET_BYTE(to_send, 3) & 0x1A) != 0) {
       tx = 0;
     }
   }
