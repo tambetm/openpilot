@@ -24,7 +24,6 @@ class CarInterface(CarInterfaceBase):
     self.CS = CarState(CP)
 
     self.cp = get_can_parser(CP)
-    self.cp_lkas = get_can_parser_lkas(CP)
 
     self.CC = None
     if CarController is not None:
@@ -108,12 +107,12 @@ class CarInterface(CarInterfaceBase):
     # ******************* do can recv *******************
     self.cp.update_strings(can_strings)
 
-    self.CS.update(self.cp, self.cp_lkas)
+    self.CS.update(self.cp)
 
     # create message
     ret = car.CarState.new_message()
 
-    ret.canValid = self.cp.can_valid and self.cp_lkas.can_valid
+    ret.canValid = self.cp.can_valid
 
     # speeds
     ret.vEgo = self.CS.v_ego
@@ -173,8 +172,9 @@ class CarInterface(CarInterfaceBase):
     # events
     events = []
 
-    if self.CS.steer_error:
-      events.append(create_event('steerUnavailable', [ET.NO_ENTRY, ET.IMMEDIATE_DISABLE, ET.PERMANENT]))
+    #if self.CS.steer_error:
+    #  events.append(create_event('steerUnavailable', [ET.NO_ENTRY, ET.IMMEDIATE_DISABLE, ET.PERMANENT]))
+    #  print "steerUnavailable!!!"
 
     # enable request in prius is simple, as we activate when Toyota is active (rising edge)
     if ret.cruiseState.enabled and not self.cruise_enabled_prev:
@@ -193,8 +193,9 @@ class CarInterface(CarInterfaceBase):
     if ret.gasPressed:
       events.append(create_event('pedalPressed', [ET.PRE_ENABLE]))
 
-    if self.CS.lkas_state not in [2, 3] and ret.vEgo > 13.* CV.MPH_TO_MS and ret.cruiseState.enabled:
-      events.append(create_event('steerTempUnavailableMute', [ET.WARNING]))
+    #if self.CS.lkas_state not in [2, 3] and ret.vEgo > 13.* CV.MPH_TO_MS and ret.cruiseState.enabled:
+    #  events.append(create_event('steerTempUnavailableMute', [ET.WARNING]))
+    #  print "steerTempUnavailableMute!!!"
 
     ret.events = events
 

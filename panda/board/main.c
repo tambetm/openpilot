@@ -110,6 +110,7 @@ void EXTI3_IRQHandler(void) {
 
 // this is the only way to leave silent mode
 void set_safety_mode(uint16_t mode, int16_t param) {
+  puts("set_safety_mode "); puth(mode); puts("\n");
   int err = safety_set_mode(mode, param);
   if (err == -1) {
     puts("Error: safety set mode failed\n");
