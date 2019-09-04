@@ -10,7 +10,7 @@ def create_steer_command(packer, angle_cmd, enabled, lkas_state, angle_steers, c
   """Creates a CAN message for the Ford Steer Command."""
 
   #if enabled and lkas available:
-  if enabled and lkas_state in [2,3]: #and (frame % 500) >= 3:
+  if enabled: #and lkas_state in [2,3]: #and (frame % 500) >= 3:
     action = lkas_action
   else:
     action = 0xf
@@ -25,7 +25,7 @@ def create_steer_command(packer, angle_cmd, enabled, lkas_state, angle_steers, c
     #"Lane_Curvature": 0,   # is it just for debug?
     "Steer_Angle_Req": angle_cmd
   }
-  return packer.make_can_msg("Lane_Keep_Assist_Control", 1, values)
+  return packer.make_can_msg("Lane_Keep_Assist_Control", 0, values)
 
 
 def create_lkas_ui(packer, main_on, enabled, steer_alert):
@@ -45,7 +45,7 @@ def create_lkas_ui(packer, main_on, enabled, steer_alert):
     "Lines_Hud": lines,
     "Hands_Warning_W_Chime": steer_alert,
   }
-  return packer.make_can_msg("Lane_Keep_Assist_Ui", 1, values)
+  return packer.make_can_msg("Lane_Keep_Assist_Ui", 0, values)
 
 def spam_cancel_button(packer):
   values = {

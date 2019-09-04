@@ -5,7 +5,7 @@ from selfdrive.swaglog import cloudlog
 from selfdrive.config import Conversions as CV
 from selfdrive.controls.lib.drive_helpers import EventTypes as ET, create_event
 from selfdrive.controls.lib.vehicle_model import VehicleModel
-from selfdrive.car.ford.carstate import CarState, get_can_parser, get_can_parser_lkas
+from selfdrive.car.ford.carstate import CarState, get_can_parser
 from selfdrive.car.ford.values import MAX_ANGLE
 from selfdrive.car import STD_CARGO_KG, scale_rot_inertia, scale_tire_stiffness
 
@@ -24,7 +24,6 @@ class CarInterface(object):
     self.CS = CarState(CP)
 
     self.cp = get_can_parser(CP)
-    self.cp_lkas = get_can_parser_lkas(CP)
 
     self.CC = None
     if CarController is not None:
@@ -110,14 +109,13 @@ class CarInterface(object):
   def update(self, c, can_strings):
     # ******************* do can recv *******************
     self.cp.update_strings(int(sec_since_boot() * 1e9), can_strings)
-    self.cp_lkas.update_strings(int(sec_since_boot() * 1e9), can_strings)
 
-    self.CS.update(self.cp, self.cp_lkas)
+    self.CS.update(self.cp)
 
     # create message
     ret = car.CarState.new_message()
 
-    ret.canValid = self.cp.can_valid and self.cp_lkas.can_valid
+    ret.canValid = self.cp.can_valid
 
     # speeds
     ret.vEgo = self.CS.v_ego
@@ -177,8 +175,9 @@ class CarInterface(object):
     # events
     events = []
 
-    if self.CS.steer_error:
-      events.append(create_event('steerUnavailable', [ET.NO_ENTRY, ET.IMMEDIATE_DISABLE, ET.PERMANENT]))
+    #if self.CS.steer_error:
+    #  events.append(create_event('steerUnavailable', [ET.NO_ENTRY, ET.IMMEDIATE_DISABLE, ET.PERMANENT]))
+    #  print "steerUnavailable!!!"
 
     # enable request in prius is simple, as we activate when Toyota is active (rising edge)
     if ret.cruiseState.enabled and not self.cruise_enabled_prev:
@@ -197,8 +196,9 @@ class CarInterface(object):
     if ret.gasPressed:
       events.append(create_event('pedalPressed', [ET.PRE_ENABLE]))
 
-    if self.CS.lkas_state not in [2, 3] and ret.vEgo > 13.* CV.MPH_TO_MS and ret.cruiseState.enabled:
-      events.append(create_event('steerTempUnavailableMute', [ET.WARNING]))
+    #if self.CS.lkas_state not in [2, 3] and ret.vEgo > 13.* CV.MPH_TO_MS and ret.cruiseState.enabled:
+    #  events.append(create_event('steerTempUnavailableMute', [ET.WARNING]))
+    #  print "steerTempUnavailableMute!!!"
 
     ret.events = events
 

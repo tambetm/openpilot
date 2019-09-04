@@ -18,6 +18,9 @@ def get_can_parser(CP):
     ("Cruise_State", "Cruise_Status", 0.),
     ("Set_Speed", "Cruise_Status", 0.),
     ("ApedPosScal_Pc_Actl", "EngineData_14", 0.),
+    ("LaActAvail_D_Actl", "Lane_Keep_Assist_Status", 0),
+    ("LaHandsOff_B_Actl", "Lane_Keep_Assist_Status", 0),
+    ("LaActDeny_B_Actl", "Lane_Keep_Assist_Status", 0),
     ("Lane_Keep_Toggle", "Steering_Buttons", 0.),
     ("Brake_Drv_Appl", "Cruise_Status", 0.),
     ("Brake_Lights", "BCM_to_HS_Body", 0.),
@@ -33,21 +36,6 @@ def get_can_parser(CP):
   ]
 
   return CANParser(DBC[CP.carFingerprint]['pt'], signals, checks, 0)
-
-
-def get_can_parser_lkas(CP):
-
-  signals = [
-    # sig_name, sig_address, default
-    ("LaActAvail_D_Actl", "Lane_Keep_Assist_Status", 0),
-    ("LaHandsOff_B_Actl", "Lane_Keep_Assist_Status", 0),
-    ("LaActDeny_B_Actl", "Lane_Keep_Assist_Status", 0),
-  ]
-
-  checks = [
-  ]
-
-  return CANParser(DBC[CP.carFingerprint]['pt'], signals, checks, 1)
 
 
 class CarState(object):
@@ -70,7 +58,7 @@ class CarState(object):
                          K=[[0.12287673], [0.29666309]])
     self.v_ego = 0.0
 
-  def update(self, cp, cp_lkas):
+  def update(self, cp):
     # update prevs, update must run once per loop
     self.prev_left_blinker_on = self.left_blinker_on
     self.prev_right_blinker_on = self.right_blinker_on
@@ -96,9 +84,10 @@ class CarState(object):
     self.v_cruise_pcm = cp.vl["Cruise_Status"]['Set_Speed'] * CV.KPH_TO_MS
     self.pcm_acc_status = cp.vl["Cruise_Status"]['Cruise_State']
     self.main_on = cp.vl["Cruise_Status"]['Cruise_State'] != 0
-    self.lkas_state = cp_lkas.vl["Lane_Keep_Assist_Status"]['LaActAvail_D_Actl']
-    self.steer_override = not cp_lkas.vl["Lane_Keep_Assist_Status"]['LaHandsOff_B_Actl']
-    self.steer_error = cp_lkas.vl["Lane_Keep_Assist_Status"]['LaActDeny_B_Actl']
+    self.lkas_state = cp.vl["Lane_Keep_Assist_Status"]['LaActAvail_D_Actl']
+    self.steer_override = not cp.vl["Lane_Keep_Assist_Status"]['LaHandsOff_B_Actl']
+    self.steer_error = cp.vl["Lane_Keep_Assist_Status"]['LaActDeny_B_Actl']
+    print "lkas_state:", self.lkas_state, "steer_override:", self.steer_override, "steer_error:", self.steer_error
     self.user_gas = cp.vl["EngineData_14"]['ApedPosScal_Pc_Actl']
     self.brake_pressed = bool(cp.vl["Cruise_Status"]["Brake_Drv_Appl"])
     self.brake_lights = bool(cp.vl["BCM_to_HS_Body"]["Brake_Lights"])
