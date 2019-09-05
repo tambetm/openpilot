@@ -172,9 +172,9 @@ class CarInterface(CarInterfaceBase):
     # events
     events = []
 
-    #if self.CS.steer_error:
-    #  events.append(create_event('steerUnavailable', [ET.NO_ENTRY, ET.IMMEDIATE_DISABLE, ET.PERMANENT]))
-    #  print "steerUnavailable!!!"
+    if self.CS.steer_error:
+      events.append(create_event('steerUnavailable', [ET.NO_ENTRY, ET.IMMEDIATE_DISABLE, ET.PERMANENT]))
+      print "steerUnavailable!!!"
 
     # enable request in prius is simple, as we activate when Toyota is active (rising edge)
     if ret.cruiseState.enabled and not self.cruise_enabled_prev:
@@ -193,9 +193,9 @@ class CarInterface(CarInterfaceBase):
     if ret.gasPressed:
       events.append(create_event('pedalPressed', [ET.PRE_ENABLE]))
 
-    #if self.CS.lkas_state not in [2, 3] and ret.vEgo > 13.* CV.MPH_TO_MS and ret.cruiseState.enabled:
-    #  events.append(create_event('steerTempUnavailableMute', [ET.WARNING]))
-    #  print "steerTempUnavailableMute!!!"
+    if self.CS.lkas_state not in [2, 3] and ret.vEgo > 13.* CV.MPH_TO_MS and ret.cruiseState.enabled:
+      events.append(create_event('steerTempUnavailableMute', [ET.WARNING]))
+      print "steerTempUnavailableMute!!!"
 
     ret.events = events
 
