@@ -87,7 +87,7 @@ class CarState():
     self.lkas_state = cp.vl["Lane_Keep_Assist_Status"]['LaActAvail_D_Actl']
     self.steer_override = not cp.vl["Lane_Keep_Assist_Status"]['LaHandsOff_B_Actl']
     self.steer_error = cp.vl["Lane_Keep_Assist_Status"]['LaActDeny_B_Actl']
-    print "lkas_state:", self.lkas_state, "steer_override:", self.steer_override, "steer_error:", self.steer_error
+    print("lkas_state:", self.lkas_state, "steer_override:", self.steer_override, "steer_error:", self.steer_error)
     self.user_gas = cp.vl["EngineData_14"]['ApedPosScal_Pc_Actl']
     self.brake_pressed = bool(cp.vl["Cruise_Status"]["Brake_Drv_Appl"])
     self.brake_lights = bool(cp.vl["BCM_to_HS_Body"]["Brake_Lights"])
