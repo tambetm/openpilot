@@ -44,7 +44,7 @@ class CarInterface(CarInterfaceBase):
     ret.isPandaBlack = has_relay
 
     ret.safetyModel = car.CarParams.SafetyModel.ford
-    ret.dashcamOnly = True
+    ret.dashcamOnly = False
 
     # pedal
     ret.enableCruise = True
@@ -53,10 +53,10 @@ class CarInterface(CarInterfaceBase):
     ret.steerRatio = 14.8
     ret.mass = 1595. + STD_CARGO_KG
     ret.lateralTuning.pid.kiBP, ret.lateralTuning.pid.kpBP = [[0.], [0.]]
-    ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.04], [0.]]     # TODO: tune this
+    ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.03], [0.]]     # TODO: tune this
     ret.lateralTuning.pid.kf = 0. #1. / MAX_ANGLE   # MAX Steer angle to normalize FF
-    ret.steerActuatorDelay = 0.4  # Default delay, not measured yet
-    ret.steerRateCost = 1.0
+    ret.steerActuatorDelay = 0.5 # Default delay, not measured yet
+    ret.steerRateCost = 2.0
     ret.centerToFront = ret.wheelbase * 0.44
     tire_stiffness_factor = 0.5328
 
@@ -85,7 +85,8 @@ class CarInterface(CarInterfaceBase):
     ret.brakeMaxBP = [5., 20.]
     ret.brakeMaxV = [1., 0.8]
 
-    ret.enableCamera = is_ecu_disconnected(fingerprint[0], FINGERPRINTS, ECU_FINGERPRINT, candidate, ECU.CAM) or has_relay
+    #ret.enableCamera = is_ecu_disconnected(fingerprint[0], FINGERPRINTS, ECU_FINGERPRINT, candidate, ECU.CAM) or has_relay
+    ret.enableCamera = True
     ret.openpilotLongitudinalControl = False
     cloudlog.warning("ECU Camera Simulated: %r", ret.enableCamera)
 
