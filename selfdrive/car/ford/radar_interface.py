@@ -5,10 +5,6 @@ import time
 
 
 class RadarInterface(RadarInterfaceBase):
-  def __init__(self, CP):
-    # radar
-    self.pts = {}
-    self.delay = 0
 
   def update(self, can_strings):
 

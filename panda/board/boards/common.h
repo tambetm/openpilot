@@ -58,20 +58,22 @@ void peripherals_init(void){
   #endif
   RCC->APB1ENR |= RCC_APB1ENR_DACEN;
   RCC->APB1ENR |= RCC_APB1ENR_TIM2EN;  // main counter
-  RCC->APB1ENR |= RCC_APB1ENR_TIM3EN;  // slow loop and pedal
-  RCC->APB1ENR |= RCC_APB1ENR_TIM4EN;  // gmlan_alt
-  //RCC->APB1ENR |= RCC_APB1ENR_TIM5EN;
-  //RCC->APB1ENR |= RCC_APB1ENR_TIM6EN;
+  RCC->APB1ENR |= RCC_APB1ENR_TIM3EN;  // pedal and fan PWM
+  RCC->APB1ENR |= RCC_APB1ENR_TIM4EN;  // gmlan_alt and IR PWM
+  RCC->APB1ENR |= RCC_APB1ENR_TIM5EN;  // k-line init
+  RCC->APB1ENR |= RCC_APB1ENR_TIM6EN;  // interrupt timer
+  RCC->APB1ENR |= RCC_APB1ENR_PWREN;   // for RTC config
   RCC->APB2ENR |= RCC_APB2ENR_USART1EN;
   RCC->AHB2ENR |= RCC_AHB2ENR_OTGFSEN;
   //RCC->APB2ENR |= RCC_APB2ENR_TIM1EN;
   RCC->APB2ENR |= RCC_APB2ENR_ADC1EN;
   RCC->APB2ENR |= RCC_APB2ENR_SPI1EN;
   RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;
+  RCC->APB2ENR |= RCC_APB2ENR_TIM9EN;  // slow loop
 }
 
 // Detection with internal pullup
-#define PULL_EFFECTIVE_DELAY 10
+#define PULL_EFFECTIVE_DELAY 4096
 bool detect_with_pull(GPIO_TypeDef *GPIO, int pin, int mode) {
   set_gpio_mode(GPIO, pin, MODE_INPUT);
   set_gpio_pullup(GPIO, pin, mode);

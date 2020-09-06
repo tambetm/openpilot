@@ -1,20 +1,20 @@
 from cereal import car
 from selfdrive.config import Conversions as CV
-from selfdrive.car.ford.fordcan import make_can_msg, create_steer_command, create_lkas_ui, \
-                                       spam_cancel_button
-from selfdrive.can.packer import CANPacker
+from selfdrive.car import make_can_msg
+from selfdrive.car.ford.fordcan import create_steer_command, create_lkas_ui, spam_cancel_button
+from opendbc.can.packer import CANPacker
 
 
 MAX_STEER_DELTA = 1
 TOGGLE_DEBUG = False
 
 class CarController():
-  def __init__(self, dbc_name, enable_camera, vehicle_model):
+  def __init__(self, dbc_name, CP, VM):
     self.packer = CANPacker(dbc_name)
-    self.enable_camera = enable_camera
+    self.enable_camera = CP.enableCamera
     self.enabled_last = False
     self.main_on_last = False
-    self.vehicle_model = vehicle_model
+    self.vehicle_model = VM
     self.generic_toggle_last = 0
     self.steer_alert_last = False
     self.lkas_action = 0
@@ -34,25 +34,25 @@ class CarController():
 
       if (frame % 3) == 0:
 
-        curvature = self.vehicle_model.calc_curvature(actuators.steerAngle*CV.DEG_TO_RAD, CS.v_ego)
+        curvature = self.vehicle_model.calc_curvature(actuators.steerAngle*CV.DEG_TO_RAD, CS.out.vEgo)
 
         # The use of the toggle below is handy for trying out the various LKAS modes
         if TOGGLE_DEBUG:
-          self.lkas_action += int(CS.generic_toggle and not self.generic_toggle_last)
+          self.lkas_action += int(CS.out.genericToggle and not self.generic_toggle_last)
           self.lkas_action &= 0xf
         else:
           self.lkas_action = 5   # 4 and 5 seem the best. 8 and 9 seem to aggressive and laggy
 
         can_sends.append(create_steer_command(self.packer, apply_steer, enabled,
-                                              CS.lkas_state, CS.angle_steers, curvature, self.lkas_action))
-        self.generic_toggle_last = CS.generic_toggle
+                                              CS.lkas_state, CS.out.steeringAngle, curvature, self.lkas_action))
+        self.generic_toggle_last = CS.out.genericToggle
 
-      if (frame % 100) == 0 or (self.enabled_last != enabled) or (self.main_on_last != CS.main_on) or \
+      if (frame % 100) == 0 or (self.enabled_last != enabled) or (self.main_on_last != CS.out.cruiseState.available) or \
          (self.steer_alert_last != steer_alert):
-        can_sends.append(create_lkas_ui(self.packer, CS.main_on, enabled, steer_alert))
+        can_sends.append(create_lkas_ui(self.packer, CS.out.cruiseState.available, enabled, steer_alert))
 
       self.enabled_last = enabled
-      self.main_on_last = CS.main_on
+      self.main_on_last = CS.out.cruiseState.available
       self.steer_alert_last = steer_alert
 
     return can_sends
