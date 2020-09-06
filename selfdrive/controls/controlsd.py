@@ -347,14 +347,8 @@ class Controls:
   def state_control(self, CS):
     """Given the state, this function returns an actuators packet"""
 
-<<<<<<< HEAD
-  # FIXME: offroad alerts should not be created with negative severity
-  connectivity_alert = params.get("Offroad_ConnectivityNeeded", encoding='utf8')
-  internet_needed = connectivity_alert is not None and json.loads(connectivity_alert)["severity"] >= 0
-=======
     plan = self.sm['plan']
     path_plan = self.sm['pathPlan']
->>>>>>> upstream/devel
 
     actuators = car.CarControl.Actuators.new_message()
 
