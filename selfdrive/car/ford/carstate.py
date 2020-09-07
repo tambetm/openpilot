@@ -34,6 +34,8 @@ class CarState(CarStateBase):
     ret.rightBlinker = bool(cp.vl["Steering_Buttons"]["Right_Turn_Light"])
     # TODO: we also need raw driver torque, needed for Assisted Lane Change
     self.lkas_state = cp.vl["Lane_Keep_Assist_Status"]['LaActAvail_D_Actl']
+    print("lkas_state:", self.lkas_state, ", steerError:", ret.steerError, ", steeringPressed:", ret.steeringPressed)
+    #print("LaActAvail_D_Actl:", cp.vl["Lane_Keep_Assist_Status"]['LaActAvail_D_Actl'], ", LaActDeny_B_Actl: ", cp.vl["Lane_Keep_Assist_Status"]['LaActDeny_B_Actl'], ", LaHandsOff_B_Actl:", cp.vl["Lane_Keep_Assist_Status"]['LaHandsOff_B_Actl'])
 
     return ret
 
